@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Bing Maps Ordnance Survey</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="map" style="width: 100vw; height: 100vh;"></div>
+<!--
+  JSPM Generator Import Map
+  Edit URL: https://generator.jspm.io/#Y2VhYGBmD80rySzJSU1hyElNTMtJLdFNysxL181JrEwtcjDWM9YzhEtkJBZnOBjoGSGEHAz1LPWMASjQJoFIAA
+-->
+<script type="importmap">
+  {
+    "imports": {
+      "leaflet": "https://ga.jspm.io/npm:leaflet@1.9.3/dist/leaflet-src.js",
+      "leaflet-bing-layer": "https://ga.jspm.io/npm:leaflet-bing-layer@3.3.1/index.js",
+      "leaflet-hash": "https://ga.jspm.io/npm:leaflet-hash@0.2.1/leaflet-hash.js"
+    },
+    "scopes": {
+      "https://ga.jspm.io/": {
+        "bbox-intersect": "https://ga.jspm.io/npm:bbox-intersect@0.1.2/index.js",
+        "fetch-jsonp": "https://ga.jspm.io/npm:fetch-jsonp@1.2.3/build/fetch-jsonp.js"
+      }
+    }
+  }
+  </script>
+
+  <!-- ES Module Shims: Import maps polyfill for modules browsers without import maps support (all except Chrome 89+) -->
+  <script async src="https://ga.jspm.io/npm:es-module-shims@1.5.1/dist/es-module-shims.js" crossorigin="anonymous"></script>
+
+  <script type="module">
+    import "leaflet";
+    import "leaflet-bing-layer";
+    import "leaflet-hash";
+
+    var map = L.map(
+      'map',
+      {
+        minZoom: 12,
+        maxZoom: 17,
+        attributionControl: false
+      }
+    ).setView([51.505, -0.09], 13);
+    L.hash(map);
+
+    // Add attribution for Ordnance Survey
+    L.control.attribution({
+      position: 'bottomright',
+      prefix: false
+    }).addAttribution('Contains OS data &copy; Crown copyright and database rights ' + (new Date().getFullYear())).addTo(map);
+
+    L.tileLayer.bing({
+      bingMapsKey: 'AnjJ3wFPDv6V8ylYxCL5QvAWdPzXgNdpZk32m34WSwwAe-gmQmIaIRieZ7a_emdc',
+      imagerySet: 'OrdnanceSurvey'
+    }).addTo(map);
+  </script>
+</body>
+</html>
