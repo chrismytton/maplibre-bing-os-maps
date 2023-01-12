@@ -1,67 +1,97 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
+
 <head>
-  <meta charset="utf-8">
-  <title>Bing Maps Ordnance Survey</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <title>Maplibre Bing OS Maps</title>
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.css" />
   <style>
-    html, body {
+    body {
       margin: 0;
       padding: 0;
     }
+
+    #map {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 100%;
+    }
+
   </style>
 </head>
+
 <body>
-  <div id="map" style="width: 100vw; height: 100vh;"></div>
-<!--
-  JSPM Generator Import Map
-  Edit URL: https://generator.jspm.io/#Y2VhYGBmD80rySzJSU1hyElNTMtJLdFNysxL181JrEwtcjDWM9YzhEtkJBZnOBjoGSGEHAz1LPWMASjQJoFIAA
--->
-<script type="importmap">
-  {
-    "imports": {
-      "leaflet": "https://ga.jspm.io/npm:leaflet@1.9.3/dist/leaflet-src.js",
-      "leaflet-bing-layer": "https://ga.jspm.io/npm:leaflet-bing-layer@3.3.1/index.js",
-      "leaflet-hash": "https://ga.jspm.io/npm:leaflet-hash@0.2.1/leaflet-hash.js"
-    },
-    "scopes": {
-      "https://ga.jspm.io/": {
-        "bbox-intersect": "https://ga.jspm.io/npm:bbox-intersect@0.1.2/index.js",
-        "fetch-jsonp": "https://ga.jspm.io/npm:fetch-jsonp@1.2.3/build/fetch-jsonp.js"
+
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.js"></script>
+  <script>
+    // Documentation: https://learn.microsoft.com/en-us/bingmaps/rest-services/imagery/get-imagery-metadata
+    class MaplibreBingMapsPlugin {
+      constructor(options) {
+        this.options = options;
+        this.options.imagerySet = this.options.imagerySet || 'AerialWithLabelsOnDemand';
+        // Add default URL if not provided
+        if (!this.options.url) {
+          this.options.url = 'https://dev.virtualearth.net/REST/v1/Imagery/Metadata/' + this.options.imagerySet + '?include=ImageryProviders&uriScheme=https&key=' + this.options.key;
+        }
+      }
+
+      async addTo(map) {
+        const response = await fetch(this.options.url);
+        const data = await response.json();
+
+        // Get the Bing resource URL
+        const resourceSets = data.resourceSets[0];
+        const resources = resourceSets.resources[0];
+        const imageUrl = resources.imageUrl;
+        const imageUrlSubdomains = resources.imageUrlSubdomains;
+        // Make an array of tile URLs from the subdomains
+        const tiles = imageUrlSubdomains.map(subdomain => imageUrl.replace('{subdomain}', subdomain));
+
+        // Add the Bing source
+        map.addSource('bing', {
+          type: 'raster',
+          tiles: tiles,
+          tileSize: resources.imageWidth,
+          minzoom: resources.zoomMin,
+          maxzoom: 16,
+        });
+
+        // Add the Bing layer
+        map.addLayer({
+          id: 'bing',
+          type: 'raster',
+          source: 'bing',
+          minZoom: 10,
+          maxZoom: 16
+        });
       }
     }
-  }
-  </script>
 
-  <!-- ES Module Shims: Import maps polyfill for modules browsers without import maps support (all except Chrome 89+) -->
-  <script async src="https://ga.jspm.io/npm:es-module-shims@1.5.1/dist/es-module-shims.js" crossorigin="anonymous"></script>
+    // Initialize the map object.
+    const map = window.map = new maplibregl.Map({
+      container: 'map',
+      center: [-2.968, 54.425],
+      zoom: 13,
+      hash: true
+    });
+    map.addControl(new maplibregl.NavigationControl());
 
-  <script type="module">
-    import "leaflet";
-    import "leaflet-bing-layer";
-    import "leaflet-hash";
+    const BING_MAPS_KEY = 'AnjJ3wFPDv6V8ylYxCL5QvAWdPzXgNdpZk32m34WSwwAe-gmQmIaIRieZ7a_emdc';
 
-    var map = L.map(
-      'map',
-      {
-        minZoom: 12,
-        maxZoom: 17,
-        attributionControl: false
-      }
-    ).setView([51.505, -0.09], 13);
-    L.hash(map);
-
-    // Add attribution for Ordnance Survey
-    L.control.attribution({
-      position: 'bottomright',
-      prefix: false
-    }).addAttribution('Contains OS data &copy; Crown copyright and database rights ' + (new Date().getFullYear())).addTo(map);
-
-    L.tileLayer.bing({
-      bingMapsKey: 'AnjJ3wFPDv6V8ylYxCL5QvAWdPzXgNdpZk32m34WSwwAe-gmQmIaIRieZ7a_emdc',
+    new MaplibreBingMapsPlugin({
+      key: BING_MAPS_KEY,
       imagerySet: 'OrdnanceSurvey'
     }).addTo(map);
+
+    map.addControl(new maplibregl.GeolocateControl());
+
+
   </script>
+
 </body>
+
 </html>
