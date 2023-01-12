@@ -65,8 +65,6 @@
           id: 'bing',
           type: 'raster',
           source: 'bing',
-          minZoom: 10,
-          maxZoom: 16
         });
       }
     }
@@ -74,9 +72,11 @@
     // Initialize the map object.
     const map = window.map = new maplibregl.Map({
       container: 'map',
-      center: [-2.968, 54.425],
-      zoom: 13,
-      hash: true
+      center: [-0.09494, 51.50901],
+      zoom: 14,
+      hash: true,
+      minZoom: 10.5,
+      maxZoom: 16,
     });
     map.addControl(new maplibregl.NavigationControl());
 
