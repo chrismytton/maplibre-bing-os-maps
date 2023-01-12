@@ -89,6 +89,11 @@
 
     map.addControl(new maplibregl.GeolocateControl());
 
+    // Add attribution
+    map.addControl(new maplibregl.AttributionControl({
+      customAttribution: 'Contains OS data &copy; Crown copyright and database rights ' + (new Date().getFullYear())
+    }));
+
 
   </script>
 
