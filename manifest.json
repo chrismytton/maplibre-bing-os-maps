@@ -1,0 +1,10 @@
+{
+  "name": "MapLibre Bing OS Maps",
+  "short_name": "OS Maps",
+  "description": "MapLibre GL JS with Bing Maps and Ordnance Survey data",
+  "start_url": "/maplibre-bing-os-maps/",
+  "scope": "/maplibre-bing-os-maps/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000"
+}
